@@ -17,7 +17,7 @@ This implementation demonstrates how AWS native services can be integrated to cr
 
 Two Linux EC2 instances were launched to simulate Development and Production workloads.
 
-![EC2 Instances](Implementation/01-ec2-instances-created.png)
+![EC2 Instances](./Implementation/01-ec2-instances-created.png)
 
 The environments provide isolated workloads that can be monitored independently.
 
