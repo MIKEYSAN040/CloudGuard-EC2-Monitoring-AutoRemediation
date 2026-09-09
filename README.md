@@ -34,7 +34,7 @@ An IAM role with the required CloudWatch permissions was created and attached to
 
 The CloudGuard Development EC2 instance was launched to host the monitoring environment.
 
-![CloudGuard Dev Instance](02-cloudguard-dev-instance.png)
+![CloudGuard Dev Instance](./Implementation/02-cloudguard-dev-instance.png)
 
 ---
 
@@ -42,7 +42,7 @@ The CloudGuard Development EC2 instance was launched to host the monitoring envi
 
 SSH access was established to configure and manage the CloudWatch Agent.
 
-![SSH Connection](03-cloudguard-dev-ssh.png)
+![SSH Connection](./Implementation/03-cloudguard-dev-ssh.png)
 
 ---
 
@@ -50,7 +50,7 @@ SSH access was established to configure and manage the CloudWatch Agent.
 
 The Amazon CloudWatch Agent was installed, configured, and verified to be running successfully.
 
-![CloudWatch Agent Running](04-cloudwatch-agent-running.png)
+![CloudWatch Agent Running](./Implementation/04-cloudwatch-agent-running.png)
 
 ---
 
@@ -58,7 +58,7 @@ The Amazon CloudWatch Agent was installed, configured, and verified to be runnin
 
 The agent began publishing CPU utilization metrics into the custom **CloudGuard** namespace in Amazon CloudWatch.
 
-![Custom Metrics](05-cloudguard-custom-metrics.png)
+![Custom Metrics](./Implementation/05-cloudguard-custom-metrics.png)
 
 ---
 
@@ -66,15 +66,15 @@ The agent began publishing CPU utilization metrics into the custom **CloudGuard*
 
 A second EC2 instance was provisioned to represent the production workload.
 
-![Production Instance](06-cloudguard-prod-instance.png)
+![Production Instance](./Implementation/06-cloudguard-prod-instance.png)
 
 SSH connectivity was verified before configuring monitoring.
 
-![Production SSH](07-cloudguard-prod-ssh.png)
+![Production SSH](./Implementation/07-cloudguard-prod-ssh.png)
 
 The CloudWatch Agent was configured and confirmed to be operational on the production instance.
 
-![Production Agent Running](08-cloudwatch-prod-agent-running.png)
+![Production Agent Running](./Implementation/08-cloudwatch-prod-agent-running.png)
 
 ---
 
@@ -82,7 +82,7 @@ The CloudWatch Agent was configured and confirmed to be operational on the produ
 
 A CloudWatch Alarm was created to monitor the custom CPU metric and detect high CPU utilization.
 
-![High CPU Alarm](09-high-cpu-alarm.png)
+![High CPU Alarm](./Implementation/09-high-cpu-alarm.png)
 
 ---
 
@@ -90,7 +90,7 @@ A CloudWatch Alarm was created to monitor the custom CPU metric and detect high 
 
 An IAM execution role was created for AWS Lambda, granting permission to reboot EC2 instances.
 
-![Lambda IAM Permissions](10-lambda-ec2-permission.png)
+![Lambda IAM Permissions](./Implementation/10-lambda-ec2-permission.png)
 
 ---
 
@@ -98,7 +98,7 @@ An IAM execution role was created for AWS Lambda, granting permission to reboot 
 
 A Python-based AWS Lambda function was implemented using the AWS SDK (Boto3) to automatically reboot the affected EC2 instance when invoked.
 
-![Lambda Function](11-lambda-auto-remediation-code.png)
+![Lambda Function](./Implementation/11-lambda-auto-remediation-code.png)
 
 ---
 
@@ -106,7 +106,7 @@ A Python-based AWS Lambda function was implemented using the AWS SDK (Boto3) to 
 
 The Lambda function was tested independently to verify successful EC2 reboot execution.
 
-![Lambda Test](12-lambda-remediation-test.png)
+![Lambda Test](./Implementation/12-lambda-remediation-test.png)
 
 ---
 
@@ -114,7 +114,7 @@ The Lambda function was tested independently to verify successful EC2 reboot exe
 
 The CloudWatch Alarm was updated to invoke the Lambda function whenever the configured CPU threshold was exceeded.
 
-![CloudWatch Alarm Updated](13-cloudwatch-alarm-updated.png)
+![CloudWatch Alarm Updated](./Implementation/13-cloudwatch-alarm-updated.png)
 
 ---
 
@@ -122,39 +122,11 @@ The CloudWatch Alarm was updated to invoke the Lambda function whenever the conf
 
 A high CPU condition triggered the CloudWatch Alarm, demonstrating that the monitoring pipeline detected the event successfully.
 
-![Alarm Triggered](14-cloudwatch-alarm-triggered.png)
+![Alarm Triggered](./Implementation/14-cloudwatch-alarm-triggered.png)
 
 The Lambda execution logs confirmed that the function was invoked and the EC2 reboot action completed successfully.
 
-![Lambda Execution Logs](15-lambda-auto-remediation-log.png)
-
----
-
-## Solution Workflow
-
-EC2 Instance
-
-↓
-
-CloudWatch Agent
-
-↓
-
-CloudWatch Custom Metrics
-
-↓
-
-CloudWatch Alarm
-
-↓
-
-AWS Lambda
-
-↓
-
-EC2 Auto Remediation
-
----
+![Lambda Execution Logs](./Implementation/15-lambda-auto-remediation-log.png)
 
 ## AWS Services Used
 
