@@ -1,1 +1,41 @@
 
+{
+  "agent": {
+    "metrics_collection_interval": 60,
+    "run_as_user": "root"
+  },
+
+  "metrics": {
+
+    "namespace": "CloudGuard",
+
+    "append_dimensions": {
+      "InstanceId": "${aws:InstanceId}"
+    },
+
+    "aggregation_dimensions": [
+      [
+        "InstanceId"
+      ]
+    ],
+
+    "metrics_collected": {
+
+      "cpu": {
+        "resources": [
+          "*"
+        ],
+
+        "measurement": [
+          "cpu_usage_idle",
+          "cpu_usage_user",
+          "cpu_usage_system"
+        ],
+
+        "totalcpu": true,
+
+        "metrics_collection_interval": 60
+      }
+    }
+  }
+}
