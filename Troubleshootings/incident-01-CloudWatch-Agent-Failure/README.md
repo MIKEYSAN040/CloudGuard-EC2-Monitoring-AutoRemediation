@@ -1,93 +1,122 @@
-
-# Incident 01 – CloudWatch Agent Failure (Monitoring Data Loss)
+# Incident 01 – CloudWatch Agent Failure
 
 ## Overview
 
-A CloudWatch monitoring failure was simulated by intentionally stopping the Amazon CloudWatch Agent on an EC2 instance. Although the EC2 instance remained healthy and accessible, it stopped publishing custom CPU utilization metrics to Amazon CloudWatch.
+During routine monitoring, a controlled failure was introduced by stopping the Amazon CloudWatch Agent running on an EC2 instance.
 
-This incident demonstrates how a Cloud Support Engineer investigates missing monitoring data, identifies the root cause, restores the monitoring service, and validates successful recovery.
-
----
-
-## 1. Monitoring Healthy (Baseline)
-
-Before introducing the incident, the CloudWatch Agent was successfully publishing custom CPU metrics from the EC2 instance to the **CloudGuard** namespace.
-
-![Monitoring Healthy](01-cloudwatch-metrics-working.png)
-
-**Observation:** CPU utilization metrics were continuously being published, confirming that monitoring was functioning normally.
+Although the application itself remained operational, the monitoring agent stopped publishing performance metrics to Amazon CloudWatch. This simulated a common production issue where infrastructure continues running but observability is lost, preventing operations teams from monitoring system health or triggering automated remediation.
 
 ---
 
-## 2. CloudWatch Agent Stopped
+## 1. Baseline – Custom Metrics Available
 
-The Amazon CloudWatch Agent service was intentionally stopped to simulate a monitoring outage.
+Before introducing the incident, the CloudWatch Agent was actively publishing custom CPU metrics to the **CloudGuard** namespace.
 
-![Agent Stopped](02-cloudwatch-agent-stopped.png)
+![Custom CloudWatch Metrics Available](01-Custom-CloudWatch-Metrics-Available.png)
 
-The service status was verified immediately after stopping the service.
-
-![Service Status](03-cloudwatch-agent-status-inactive.png)
-
-System logs confirmed that the CloudWatch Agent had stopped successfully.
-
-![Agent Stop Logs](04-cloudwatch-agent-stop-logs.png)
-
-**Observation:** The CloudWatch Agent entered an **inactive (dead)** state, preventing the EC2 instance from publishing custom metrics.
+This confirmed that monitoring was functioning correctly before the failure was introduced.
 
 ---
 
-## 3. Monitoring Failure Observed
+## 2. Baseline – Metrics Flowing Normally
 
-Initially, CloudWatch continued displaying historical metric data. After several minutes, no new CPU datapoints appeared on the graph, resulting in a visible gap.
+The CloudWatch metric graph showed continuous CPU metric collection from the EC2 instance.
 
-![Metric Gap](05-cloudwatch-metric-gap.png)
+![Metric Graph Before Agent Stop](02_Before_Stopping_Agent_Metric_Graph.png)
 
-As older datapoints aged out of the selected time window, CloudWatch displayed **No data available**, confirming complete loss of monitoring visibility.
-
-![No Metrics Available](06-cloudwatch-no-data.png)
-
-**Observation:** The EC2 instance remained operational, but CloudWatch stopped receiving new custom CPU metrics.
+This established a healthy monitoring baseline.
 
 ---
 
-## 4. Investigation & Resolution
+## 3. Incident Introduced – CloudWatch Agent Stopped
 
-The CloudWatch Agent service was restarted to restore monitoring.
+The CloudWatch Agent service was intentionally stopped on the EC2 instance to simulate a monitoring failure.
 
-![Agent Restart](07-cloudwatch-agent-started.png)
+System logs confirmed that the service had been stopped successfully.
 
-The service logs were reviewed after startup to verify successful initialization.
-
-![Recovery Logs](08-cloudwatch-agent-recovery-logs.png)
-
-**Root Cause:** The Amazon CloudWatch Agent service had been stopped, preventing the collection and publication of custom CloudWatch metrics.
-
-**Resolution:** The CloudWatch Agent service was restarted successfully, restoring metric collection.
+![CloudWatch Agent Stopped](03-CloudWatch-Agent-System-Logs-Service-Stopped.png)
 
 ---
 
-## 5. Validation
+## 4. Investigation – Metrics No Longer Received
 
-After restarting the CloudWatch Agent, new CPU utilization datapoints began appearing in CloudWatch.
+After stopping the agent, CloudWatch stopped receiving new performance metrics.
 
-![Metrics Restored](09-cloudwatch-metrics-restored.png)
+The existing graph remained visible, but no additional datapoints were published.
 
-The associated CloudWatch alarm automatically returned to the **OK** state after receiving fresh metrics.
+![No New Metrics](04_No_New_Metrics_After_Agent_Stop.png)
 
-![Alarm Restored](10-cloudwatch-alarm-ok.png)
+### Observed Symptom
+
+> EC2 instance remained healthy, but CloudWatch monitoring data stopped updating.
 
 ---
 
-## Skills Demonstrated
+## 5. Monitoring Impact
 
-- Amazon EC2
-- Amazon CloudWatch
-- Amazon CloudWatch Agent
-- Linux Service Management (`systemctl`)
-- Linux Log Analysis (`journalctl`)
-- CloudWatch Monitoring
-- Incident Troubleshooting
-- Root Cause Analysis
-- Monitoring Recovery
-- Cloud Infrastructure Support
+As metric collection stopped, the associated CloudWatch alarm transitioned to the **Insufficient Data** state because no new datapoints were available for evaluation.
+
+![Alarm Insufficient Data](05_Alarm_InsufficientData.png)
+
+This demonstrated how monitoring failures can directly impact alerting systems.
+
+---
+
+## 6. Resolution – Restart CloudWatch Agent
+
+The CloudWatch Agent service was restarted on the EC2 instance to restore monitoring.
+
+![CloudWatch Agent Restarted](06_Agent_Restarted.png)
+
+---
+
+## 7. Verification
+
+System logs confirmed that the CloudWatch Agent started successfully and resumed normal operation.
+
+![Recovery Logs](07_CloudWatchAgent_Recovery_Logs.png)
+
+### Root Cause
+
+The Amazon CloudWatch Agent service had stopped running, preventing custom metrics from being published to CloudWatch.
+
+### Resolution
+
+The CloudWatch Agent service was restarted, restoring communication between the EC2 instance and Amazon CloudWatch.
+
+---
+
+## 8. Final Validation – Monitoring Restored
+
+After restarting the service, CloudWatch resumed receiving CPU metrics and the monitoring dashboard returned to normal operation.
+
+![Metrics Resumed](08_Metrics_Resumed.png)
+
+This confirmed successful restoration of the monitoring pipeline.
+
+---
+
+## Troubleshooting Method
+
+**Establish Baseline -> Introduce Failure -> Observe Symptoms -> Investigate -> Identify Root Cause -> Restore Service -> Validate Recovery**
+
+---
+
+## Cloud Support Skills Demonstrated
+
+- Amazon EC2 administration
+- Amazon CloudWatch monitoring
+- CloudWatch Agent troubleshooting
+- Linux systemd service management
+- CloudWatch Alarm analysis
+- Log investigation using journalctl
+- Root cause analysis
+- Incident recovery and validation
+
+---
+
+## Key Takeaway
+
+This incident demonstrates a practical cloud operations scenario where monitoring infrastructure failed while the EC2 instance continued running normally.
+
+Rather than focusing only on application availability, the investigation identified a loss of observability, restored the CloudWatch Agent service, and verified that monitoring and alerting resumed successfully. This reflects the type of operational troubleshooting commonly performed by Cloud Support and Cloud Operations Engineers.
