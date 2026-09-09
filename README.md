@@ -1,176 +1,158 @@
-# Project Setup & Implementation
+# CloudGuard EC2 Monitoring & Auto Remediation – Implementation
 
 ## Overview
 
-To build a cloud-native monitoring and automated remediation solution, two Amazon EC2 instances were provisioned to represent separate environments:
+This project demonstrates the implementation of an automated monitoring and remediation solution for Amazon EC2 instances using AWS native services.
 
-- Development Environment
-- Production Environment
+The solution continuously monitors custom CPU metrics collected by the Amazon CloudWatch Agent. When CPU utilization exceeds the configured threshold, Amazon CloudWatch automatically invokes an AWS Lambda function to reboot the affected EC2 instance without manual intervention.
 
-Amazon CloudWatch Agent was configured on both servers to publish operating system metrics into a custom CloudWatch namespace. A CloudWatch Alarm was then configured to monitor CPU utilization and automatically invoke an AWS Lambda function capable of rebooting an affected EC2 instance when predefined thresholds were exceeded.
-
-This implementation demonstrates how AWS native services can be integrated to create a self-healing infrastructure capable of reducing manual operational effort.
+The implementation showcases a practical cloud operations workflow commonly used to improve infrastructure availability and reduce operational response time.
 
 ---
 
-## 1. EC2 Infrastructure Provisioned
+## Architecture Components
 
-Two Linux EC2 instances were launched to simulate Development and Production workloads.
-
-![EC2 Instances](./Implementation/01-ec2-instances-created.png)
-
-The environments provide isolated workloads that can be monitored independently.
-
----
-
-## 2. Development Server Verification
-
-The Development EC2 instance was accessed using SSH to verify connectivity and confirm the operating system before configuration began.
-
-![Development Server](Implementation/02-dev-instance-verification.png)
-
-This ensured the instance was reachable and ready for monitoring agent installation.
+- Amazon EC2
+- IAM Roles
+- Amazon CloudWatch Agent
+- Amazon CloudWatch Custom Metrics
+- Amazon CloudWatch Alarm
+- AWS Lambda
+- Amazon EC2 Auto Remediation
 
 ---
 
-## 3. Production Server Verification
+## 1. Configure IAM Role for Monitoring
 
-The Production EC2 instance was verified using the same process to ensure both environments were operational.
+An IAM role with the required CloudWatch permissions was created and attached to the EC2 instance, allowing the CloudWatch Agent to publish custom metrics securely.
 
-![Production Server](Implementation/03-prod-instance-verification.png)
-
-Having identical environments helps simulate real enterprise deployments.
+![CloudWatch IAM Role](./Implementation/01-cloudwatch-iam-role.png)
 
 ---
 
-## 4. CloudWatch Agent Installation
+## 2. Provision Monitoring Instance
 
-Amazon CloudWatch Agent was installed and configured on both EC2 instances.
+The CloudGuard Development EC2 instance was launched to host the monitoring environment.
 
-![CloudWatch Agent Installation](Implementation/04-cloudwatch-agent-installation.png)
-
-The agent enables operating system metrics such as CPU utilization, memory usage, and disk statistics to be published into Amazon CloudWatch.
+![CloudGuard Dev Instance](02-cloudguard-dev-instance.png)
 
 ---
 
-## 5. CloudWatch Agent Running Successfully
+## 3. Connect to the EC2 Instance
 
-After installation, the CloudWatch Agent service was started and verified.
+SSH access was established to configure and manage the CloudWatch Agent.
 
-![Agent Running](Implementation/05-cloudwatch-agent-running.png)
-
-Successful service execution confirmed that the monitoring agent was actively collecting metrics.
+![SSH Connection](03-cloudguard-dev-ssh.png)
 
 ---
 
-## 6. Custom Metrics Published
+## 4. Configure CloudWatch Agent
 
-After the agent started successfully, custom EC2 metrics appeared under the CloudGuard namespace inside Amazon CloudWatch.
+The Amazon CloudWatch Agent was installed, configured, and verified to be running successfully.
 
-![Custom Metrics](Implementation/06-custom-metrics-visible.png)
-
-This verified that metric collection from the operating system was functioning correctly.
+![CloudWatch Agent Running](04-cloudwatch-agent-running.png)
 
 ---
 
-## 7. CloudWatch Metrics Dashboard
+## 5. Publish Custom Metrics
 
-The custom metrics were visualized through the CloudWatch Metrics dashboard.
+The agent began publishing CPU utilization metrics into the custom **CloudGuard** namespace in Amazon CloudWatch.
 
-![Dashboard](Implementation/07-cloudwatch-dashboard.png)
-
-The dashboard provided real-time visibility into CPU utilization for both Development and Production servers.
+![Custom Metrics](05-cloudguard-custom-metrics.png)
 
 ---
 
-## 8. CloudWatch Alarm Created
+## 6. Prepare Production Instance
 
-A CloudWatch Alarm was configured to continuously monitor CPU User Utilization.
+A second EC2 instance was provisioned to represent the production workload.
 
-![Alarm Created](Implementation/08-cloudwatch-alarm-created.png)
+![Production Instance](06-cloudguard-prod-instance.png)
 
-Whenever CPU utilization exceeds the configured threshold, CloudWatch transitions the alarm into the **ALARM** state.
+SSH connectivity was verified before configuring monitoring.
 
----
+![Production SSH](07-cloudguard-prod-ssh.png)
 
-## 9. SNS Notification Configuration
+The CloudWatch Agent was configured and confirmed to be operational on the production instance.
 
-Amazon SNS was configured as the notification service for CloudWatch alarms.
-
-![SNS Topic](Implementation/09-sns-topic-created.png)
-
-This enables operations teams to receive immediate alerts whenever monitored resources experience abnormal behavior.
+![Production Agent Running](08-cloudwatch-prod-agent-running.png)
 
 ---
 
-## 10. Email Subscription Confirmed
+## 7. Configure High CPU Alarm
 
-The email subscription associated with the SNS topic was confirmed successfully.
+A CloudWatch Alarm was created to monitor the custom CPU metric and detect high CPU utilization.
 
-![SNS Subscription](Implementation/10-email-subscription-confirmed.png)
-
-This completed the notification pipeline from CloudWatch to administrators.
+![High CPU Alarm](09-high-cpu-alarm.png)
 
 ---
 
-## 11. AWS Lambda Function Created
+## 8. Configure Lambda Permissions
 
-An AWS Lambda function was created to perform automatic remediation.
+An IAM execution role was created for AWS Lambda, granting permission to reboot EC2 instances.
 
-![Lambda Created](Implementation/11-lambda-created.png)
-
-Instead of requiring manual intervention, Lambda can automatically execute corrective actions whenever CloudWatch detects an incident.
+![Lambda IAM Permissions](10-lambda-ec2-permission.png)
 
 ---
 
-## 12. Lambda Auto-Remediation Logic
+## 9. Develop Auto Remediation Function
 
-The Lambda function was implemented using Python and AWS Boto3.
+A Python-based AWS Lambda function was implemented using the AWS SDK (Boto3) to automatically reboot the affected EC2 instance when invoked.
 
-![Lambda Code](Implementation/12-lambda-code.png)
-
-The function performs the following tasks:
-
-- Receives an EC2 Instance ID
-- Connects to Amazon EC2 using Boto3
-- Initiates an EC2 reboot operation
-- Logs the execution outcome
-
-This allows infrastructure recovery to occur automatically without requiring administrator intervention.
+![Lambda Function](11-lambda-auto-remediation-code.png)
 
 ---
 
-## 13. CloudWatch Alarm Action Configuration
+## 10. Validate Lambda Function
 
-The CloudWatch Alarm was configured to invoke the Lambda function whenever the alarm entered the **ALARM** state.
+The Lambda function was tested independently to verify successful EC2 reboot execution.
 
-![Alarm Actions](Implementation/14-cloudwatch-alarm-actions.png)
-
-This established the event-driven integration between CloudWatch and Lambda.
+![Lambda Test](12-lambda-remediation-test.png)
 
 ---
 
-## 14. Automated Self-Healing Workflow
+## 11. Integrate CloudWatch with Lambda
 
-The complete monitoring workflow was successfully integrated.
+The CloudWatch Alarm was updated to invoke the Lambda function whenever the configured CPU threshold was exceeded.
 
-![Workflow](Implementation/15-auto-remediation-workflow.png)
+![CloudWatch Alarm Updated](13-cloudwatch-alarm-updated.png)
 
+---
 
-## 15. Completed Project Architecture
+## 12. End-to-End Validation
 
-The final implementation demonstrates a complete AWS monitoring and automated remediation solution.
+A high CPU condition triggered the CloudWatch Alarm, demonstrating that the monitoring pipeline detected the event successfully.
 
-![Final Architecture](Implementation/16-final-project-overview.png)
+![Alarm Triggered](14-cloudwatch-alarm-triggered.png)
 
-The solution combines multiple AWS services into an event-driven architecture capable of:
+The Lambda execution logs confirmed that the function was invoked and the EC2 reboot action completed successfully.
 
-- Continuous infrastructure monitoring
-- Real-time metric collection
-- Automated alert generation
-- Serverless remediation
-- Reduced operational response time
-- Improved infrastructure availability
+![Lambda Execution Logs](15-lambda-auto-remediation-log.png)
+
+---
+
+## Solution Workflow
+
+EC2 Instance
+
+↓
+
+CloudWatch Agent
+
+↓
+
+CloudWatch Custom Metrics
+
+↓
+
+CloudWatch Alarm
+
+↓
+
+AWS Lambda
+
+↓
+
+EC2 Auto Remediation
 
 ---
 
@@ -179,25 +161,30 @@ The solution combines multiple AWS services into an event-driven architecture ca
 - Amazon EC2
 - Amazon CloudWatch
 - Amazon CloudWatch Agent
-- Amazon SNS
 - AWS Lambda
-- AWS IAM
-- Amazon VPC
+- AWS Identity and Access Management (IAM)
+- Amazon SNS (Alarm Notifications)
+- AWS SDK for Python (Boto3)
 
 ---
 
 ## Skills Demonstrated
 
+- AWS Infrastructure Deployment
 - Amazon EC2 Administration
-- Linux Server Management
-- CloudWatch Monitoring
+- IAM Roles & Permissions
 - CloudWatch Agent Configuration
+- Custom Metric Collection
 - CloudWatch Alarm Configuration
 - AWS Lambda Development
-- Amazon SNS Notifications
-- IAM Role Management
+- Python Automation
 - Infrastructure Monitoring
-- Event-Driven Architecture
-- Automated Remediation
-- Root Cause Analysis
+- Automated Incident Remediation
 - Cloud Operations
+- Root Cause Validation
+
+---
+
+## Key Takeaway
+
+This project demonstrates the implementation of an event-driven monitoring and automated remediation solution using AWS native services. By integrating CloudWatch monitoring with AWS Lambda automation, the solution reduces manual operational effort, improves infrastructure resilience, and enables faster recovery from high CPU utilization events. The implementation reflects practical cloud engineering and cloud support practices commonly adopted in production environments.
