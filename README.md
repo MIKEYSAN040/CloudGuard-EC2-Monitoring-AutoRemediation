@@ -27,11 +27,10 @@ An AWS monitoring and automated recovery project designed to detect **EC2 perfor
 Investigated and resolved realistic monitoring and automation incidents:
 
 
-* Incident-01-CloudWatch Agent Stopped      -   Agent / Monitoring      
-* Incident-02-High CPU Auto-Remediation     -   CloudWatch / Lambda     
-* Incident-03-Lambda IAM Denied             -   IAM / Permissions       
-* Incident-04-Alarm Not Triggering          -   Monitoring / Thresholds 
-* Incident-05-Incorrect Agent Configuration -   Configuration / Metrics 
+* Incident-01-CloudWatch Agent Stopped            
+* Incident-02-Lambda IAM Denied
+* Incident-03-EC2 Instance Availability Recovery                  
+* Incident-04-Alarm Not Triggering          
 
 ## Support Workflow
 
