@@ -28,10 +28,10 @@ Investigated and resolved realistic monitoring and automation incidents:
 
 
 * Incident-01-CloudWatch Agent Stopped      -   Agent / Monitoring      
-* Incident-01-High CPU Auto-Remediation     -   CloudWatch / Lambda     
-* Incident-01-Lambda IAM Denied             -   IAM / Permissions       
-* Incident-01-Alarm Not Triggering          -   Monitoring / Thresholds 
-* Incident-01-Incorrect Agent Configuration -   Configuration / Metrics 
+* Incident-02-High CPU Auto-Remediation     -   CloudWatch / Lambda     
+* Incident-03-Lambda IAM Denied             -   IAM / Permissions       
+* Incident-04-Alarm Not Triggering          -   Monitoring / Thresholds 
+* Incident-05-Incorrect Agent Configuration -   Configuration / Metrics 
 
 ## Support Workflow
 
